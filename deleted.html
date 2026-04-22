@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>pedinfo 削除済みアーカイブ</title>
+<style>
+  body { font-family: "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif; background:#f5f7fa; margin:0; padding:0; }
+  header { background:#546e7a; color:#fff; padding:16px 24px; position:sticky; top:0; z-index:100; }
+  header h1 { margin:0; font-size:18px; }
+  header small { font-size:12px; opacity:0.8; }
+  .container { max-width:700px; margin:0 auto; padding:16px; }
+  .back-link { display:inline-block; margin-bottom:16px; color:#00796b; text-decoration:none; font-size:13px; }
+  .section-title { font-size:15px; font-weight:bold; color:#555; margin:20px 0 8px; border-left:4px solid #546e7a; padding-left:10px; }
+  .section-note { font-size:12px; color:#888; margin-bottom:8px; }
+  .card { border-radius:8px; padding:12px 16px; margin-bottom:8px; cursor:pointer; box-shadow:0 1px 3px rgba(0,0,0,0.1); transition:box-shadow 0.15s; }
+  .card:hover { box-shadow:0 3px 8px rgba(0,0,0,0.18); }
+  .card-title { font-size:14px; font-weight:bold; margin-top:6px; line-height:1.5; }
+  .card-meta { font-size:12px; color:#888; margin-top:4px; }
+  .detail { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:200; overflow-y:auto; }
+  .detail-inner { background:#fff; max-width:680px; margin:40px auto; border-radius:12px; padding:28px 32px; position:relative; }
+  .detail-inner h2 { font-size:18px; margin-top:12px; }
+  .detail-inner h3 { font-size:14px; color:#00796b; margin-top:20px; }
+  .detail-inner p { font-size:14px; line-height:1.8; color:#333; }
+  .meta { color:#888; font-size:13px; }
+  .close-btn { float:right; background:#eee; border:none; border-radius:6px; padding:6px 14px; cursor:pointer; font-size:13px; }
+  .restore-btn { float:right; background:#e8f5e9; color:#2e7d32; border:1px solid #a5d6a7; border-radius:6px; padding:6px 14px; cursor:pointer; font-size:13px; margin-right:8px; }
+  .link-btn { display:inline-block; background:#00796b; color:#fff; padding:8px 18px; border-radius:6px; text-decoration:none; font-size:13px; margin-top:8px; }
+  .cat-tag { background:#e0f2f1; color:#00796b; border:1px solid #80cbc4; padding:1px 7px; border-radius:10px; font-size:11px; font-weight:normal; vertical-align:middle; }
+  .manual-section { margin-top:32px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>pedinfo 削除済みアーカイブ</h1>
+  <small>最終更新: 2026/04/22 23:49　／　自動削除 0 件</small>
+</header>
+<div class="container">
+  <a href="index.html" class="back-link">← アーカイブに戻る</a>
+
+  <div class="section-title">自動削除済み</div>
+  <div class="section-note">復元すると次のページ読み込み時にアーカイブに表示されます。</div>
+  <p style="color:#aaa;text-align:center;padding:24px">自動削除された記事はありません</p>
+
+  <div class="manual-section">
+    <div class="section-title">手動削除済み</div>
+    <div class="section-note">このブラウザで削除ボタンを押した記事です。</div>
+    <div id="manual-cards"><p style="color:#aaa;text-align:center;padding:24px">読み込み中...</p></div>
+  </div>
+</div>
+
+<script>
+var PURGED_ITEMS = [];
+var DELETED_KEY = 'pedinfo_deleted_items';
+var RESTORED_KEY = 'pedinfo_restored_items';
+
+function getDeleted() { try { return JSON.parse(localStorage.getItem(DELETED_KEY) || '[]'); } catch(e) { return []; } }
+function getRestored() { try { return JSON.parse(localStorage.getItem(RESTORED_KEY) || '[]'); } catch(e) { return []; } }
+
+function showDetail(uid) { document.getElementById('detail-' + uid).style.display = 'block'; document.body.style.overflow = 'hidden'; }
+function hideDetail(uid) { document.getElementById('detail-' + uid).style.display = 'none'; document.body.style.overflow = ''; }
+document.querySelectorAll('.detail').forEach(function(el) {
+  el.addEventListener('click', function(e) { if (e.target === el) { el.style.display = 'none'; document.body.style.overflow = ''; } });
+});
+
+function restoreAuto(uid, idx) {
+  var item = PURGED_ITEMS[idx];
+  if (!item) { alert('データが見つかりません'); return; }
+  var restored = getRestored();
+  var urls = restored.map(function(it) { return it.url; });
+  if (urls.indexOf(item.url) === -1) { restored.push(item); }
+  localStorage.setItem(RESTORED_KEY, JSON.stringify(restored));
+  hideDetail(uid);
+  var card = document.getElementById('card-' + uid);
+  if (card) { card.style.opacity = '0.4'; card.style.pointerEvents = 'none'; }
+  alert('復元しました。アーカイブページに戻ると表示されます。');
+}
+
+var BADGE = {
+  '最重要': '<span style="background:#e53935;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:bold;">最重要</span>',
+  '重要':   '<span style="background:#fb8c00;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:bold;">重要</span>',
+  '情報':   '<span style="background:#1976d2;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:bold;">参考</span>'
+};
+var BG = { '最重要': '#fff3f3', '重要': '#fff8f0', '情報': '#f0f6ff' };
+
+window.addEventListener('DOMContentLoaded', function() {
+  var deleted = getDeleted();
+  var container = document.getElementById('manual-cards');
+  if (deleted.length === 0) {
+    container.innerHTML = '<p style="color:#aaa;text-align:center;padding:24px">手動削除済みの記事はありません</p>';
+    return;
+  }
+  container.innerHTML = deleted.map(function(item, i) {
+    if (typeof item === 'string') item = { url: item, title: item, importance: '情報', source_name: '', category: '', summary: '', action_required: '', deadline_hint: '' };
+    var uid = 'manual_' + i;
+    var imp = item.importance || '情報';
+    var badge = BADGE[imp] || BADGE['情報'];
+    var bg = BG[imp] || BG['情報'];
+    var cat = item.category ? '<span class="cat-tag">' + item.category + '</span>' : '';
+    var summary = (item.summary || '').split('\n').join('<br>');
+    var action = (item.action_required || '').split('\n').join('<br>');
+    var deadline = item.deadline_hint || '';
+    return (
+      '<div class="card manual-card" id="card-' + uid + '" data-uid="' + uid + '" style="background:' + bg + '">' +
+        '<div class="card-title">' + badge + ' ' + cat + ' ' + (item.title||item.url) + '</div>' +
+        '<div class="card-meta">' + (item.source_name||'') + (item.archive_date ? '　' + item.archive_date : '') + '</div>' +
+      '</div>' +
+      '<div class="detail manual-detail" id="detail-' + uid + '" data-uid="' + uid + '" data-idx="' + i + '">' +
+        '<div class="detail-inner">' +
+          '<button class="close-btn manual-close">✕ 閉じる</button>' +
+          '<button class="restore-btn manual-restore" data-idx="' + i + '">↩ 復元する</button>' +
+          '<h2>' + badge + ' ' + (item.title||'') + '</h2>' +
+          '<p class="meta">情報源: <a href="' + item.url + '" target="_blank">' + (item.source_name||item.url) + '</a>' + (item.archive_date ? '　／　' + item.archive_date : '') + (cat ? '　' + cat : '') + '</p>' +
+          (summary ? '<h3>概要</h3><p>' + summary + '</p>' : '') +
+          (action ? '<h3>小児科医がやること</h3><p>' + action + '</p>' : '') +
+          (deadline ? '<h3>対応期限</h3><p>' + deadline + '</p>' : '') +
+          '<p><a href="' + item.url + '" target="_blank" class="link-btn">元記事を開く →</a></p>' +
+        '</div>' +
+      '</div>'
+    );
+  }).join('');
+
+  // 手動削除の復元ボタン
+  container.querySelectorAll('.manual-card').forEach(function(card) {
+    card.addEventListener('click', function() {
+      var uid = card.dataset.uid;
+      document.getElementById('detail-' + uid).style.display = 'block';
+      document.body.style.overflow = 'hidden';
+    });
+  });
+  container.querySelectorAll('.manual-close').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var detail = btn.closest('.detail');
+      detail.style.display = 'none';
+      document.body.style.overflow = '';
+    });
+  });
+  container.querySelectorAll('.manual-restore').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var idx = parseInt(btn.dataset.idx);
+      var deleted = getDeleted();
+      if (typeof deleted[idx] === 'string') deleted[idx] = { url: deleted[idx], title: deleted[idx], importance: '情報', source_name: '', category: '' };
+      var item = deleted[idx];
+      if (!item) return;
+      var restored = getRestored();
+      var urls = restored.map(function(it) { return it.url; });
+      if (urls.indexOf(item.url) === -1) { restored.push(item); }
+      localStorage.setItem(RESTORED_KEY, JSON.stringify(restored));
+      var detail = btn.closest('.detail');
+      detail.style.display = 'none';
+      document.body.style.overflow = '';
+      var card = container.querySelector('#card-manual_' + idx);
+      if (card) { card.style.opacity = '0.4'; card.style.pointerEvents = 'none'; }
+      alert('復元しました。アーカイブページに戻ると表示されます。');
+    });
+  });
+});
+</script>
+</body>
+</html>
