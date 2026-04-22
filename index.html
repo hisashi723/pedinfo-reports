@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>pedinfo — 小児科医療ニュースアーカイブ</title>
+<style>
+  body { font-family: "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif; background:#f5f7fa; margin:0; padding:0; }
+  header { background:#00796b; color:#fff; padding:16px 24px; position:sticky; top:0; z-index:100; }
+  header h1 { margin:0; font-size:18px; }
+  header small { font-size:12px; opacity:0.8; }
+  .container { max-width:700px; margin:0 auto; padding:16px; }
+
+  /* 目次 */
+  .toc { background:#fff; border-radius:8px; margin-bottom:16px; box-shadow:0 1px 3px rgba(0,0,0,0.08); overflow:hidden; }
+  .toc-header { padding:12px 18px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; user-select:none; }
+  .toc-header:hover { background:#f5f7fa; }
+  .toc-title { font-size:13px; font-weight:bold; color:#555; }
+  .toc-arrow { font-size:12px; color:#888; transition:transform 0.2s; }
+  .toc.open .toc-arrow { transform:rotate(180deg); }
+  .toc-body { display:none; padding:0 18px 14px; }
+  .toc.open .toc-body { display:block; }
+  .toc-item { display:inline-block; margin:3px 4px; padding:4px 10px; background:#e0f2f1; border-radius:12px; font-size:12px; text-decoration:none; color:#00796b; }
+  .toc-item:hover { background:#b2dfdb; }
+  .toc-count { font-size:11px; color:#888; }
+
+  /* カテゴリフィルター */
+  .filter-bar { margin-bottom:12px; display:flex; flex-wrap:wrap; gap:6px; }
+  .cat-btn { border:1px solid #ccc; background:#fff; border-radius:14px; padding:4px 12px; font-size:12px; cursor:pointer; }
+  .cat-btn.active { background:#00796b; color:#fff; border-color:#00796b; }
+
+  .date-header { font-size:15px; font-weight:bold; color:#555; margin:20px 0 8px; border-left:4px solid #00796b; padding-left:10px; scroll-margin-top:80px; }
+  .card { border-radius:8px; padding:12px 16px; margin-bottom:8px; cursor:pointer; box-shadow:0 1px 3px rgba(0,0,0,0.1); transition:box-shadow 0.15s; }
+  .card:hover { box-shadow:0 3px 8px rgba(0,0,0,0.18); }
+  .card-title { font-size:14px; font-weight:bold; margin-top:6px; line-height:1.5; }
+  .card-meta { font-size:12px; color:#888; margin-top:4px; }
+
+  /* モーダル */
+  .detail { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:200; overflow-y:auto; }
+  .detail-inner { background:#fff; max-width:680px; margin:40px auto; border-radius:12px; padding:28px 32px; position:relative; }
+  .detail-inner h2 { font-size:18px; margin-top:12px; }
+  .detail-inner h3 { font-size:14px; color:#00796b; margin-top:20px; }
+  .detail-inner p { font-size:14px; line-height:1.8; color:#333; }
+  .meta { color:#888; font-size:13px; }
+  .close-btn { float:right; background:#eee; border:none; border-radius:6px; padding:6px 14px; cursor:pointer; font-size:13px; }
+  .delete-btn { float:right; background:#ffebee; color:#c62828; border:1px solid #ef9a9a; border-radius:6px; padding:6px 14px; cursor:pointer; font-size:13px; margin-right:8px; }
+  .link-btn { display:inline-block; background:#00796b; color:#fff; padding:8px 18px; border-radius:6px; text-decoration:none; font-size:13px; margin-top:8px; }
+  .cat-tag { background:#e0f2f1; color:#00796b; border:1px solid #80cbc4; padding:1px 7px; border-radius:10px; font-size:11px; font-weight:normal; vertical-align:middle; }
+  .star-btn { float:right; background:none; border:none; font-size:18px; cursor:pointer; padding:0 0 0 8px; line-height:1; opacity:0.3; transition:opacity 0.15s; }
+  .star-btn.starred { opacity:1; }
+  .star-btn:hover { opacity:0.8; }
+</style>
+</head>
+<body>
+<header>
+  <h1>pedinfo — 小児科医療ニュース</h1>
+  <small>最終更新: 2026/04/22 23:49　／　合計 8 件　／　<a href="deleted.html" style="color:#b2dfdb">削除済み記事を見る</a></small>
+</header>
+<div class="container">
+
+  <div class="toc" id="toc-box">
+    <div class="toc-header" onclick="document.getElementById('toc-box').classList.toggle('open')">
+      <span class="toc-title">📅 日付から探す</span>
+      <span class="toc-arrow">▼</span>
+    </div>
+    <div class="toc-body"><a href="#date-2026-04-22" class="toc-item">2026年4月22日 <span class="toc-count">5件</span></a>
+<a href="#date-2026-04-21" class="toc-item">2026年4月21日 <span class="toc-count">1件</span></a>
+<a href="#date-2026-04-16" class="toc-item">2026年4月16日 <span class="toc-count">1件</span></a>
+<a href="#date-2026-04-12" class="toc-item">2026年4月12日 <span class="toc-count">1件</span></a></div>
+  </div>
+
+  <div class="filter-bar">
+    <button class="cat-btn" onclick="filterCat('')" data-cat="">すべて</button>
+<button class="cat-btn active" onclick="filterCat('!医薬品供給')" data-cat="!医薬品供給">医薬品供給以外</button>
+<button class="cat-btn" onclick="filterCat('★重要')" data-cat="★重要">⭐ 重要マーク</button>
+<button class="cat-btn" onclick="filterCat('ワクチン・予防接種')" data-cat="ワクチン・予防接種">ワクチン・予防接種</button>
+<button class="cat-btn" onclick="filterCat('医薬品供給')" data-cat="医薬品供給">医薬品供給</button>
+<button class="cat-btn" onclick="filterCat('感染症')" data-cat="感染症">感染症</button>
+
+  </div>
+
+<div class="date-header" id="date-2026-04-22">2026年4月22日</div>
+
+<div class="card" id="card-2026-04-22_0" data-cat="感染症" data-url="https://www.jpeds.or.jp/society-activities/post-156349.html" style="background:#fff3f3" onclick="showDetail('2026-04-22_0')">
+  <button class="star-btn" id="star-2026-04-22_0" onclick="event.stopPropagation();toggleStar('2026-04-22_0')" title="重要マーク">⭐</button>
+  <div class="card-title"><span style="background:#e53935;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:bold;">最重要</span> <span class="cat-tag">感染症</span> 2026年麻疹患者数急増に関する注意喚起（日本小児科学会）</div>
+  <div class="card-meta">日本小児科学会　2026-04-22</div>
+</div>
+<div class="detail" id="detail-2026-04-22_0">
+  <div class="detail-inner">
+    <button class="close-btn" onclick="hideDetail('2026-04-22_0')">✕ 閉じる</button>
+    <button class="delete-btn" onclick="deleteItem('2026-04-22_0')">🗑 この記事を削除</button>
+    <h2><span style="background:#e53935;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:bold;">最重要</span> 2026年麻疹患者数急増に関する注意喚起（日本小児科学会）</h2>
+    <p class="meta">情報源: <a href="https://www.jpeds.or.jp/society-activities/post-156349.html" target="_blank">日本小児科学会</a>　／　2026-04-22　<span class="cat-tag">感染症</span></p>
+    <h3>概要</h3><p>2026年第1〜12週の麻疹累積報告数は152例に達し、流行の兆しが顕著。東京（40例）・愛知（23例）が中心で、海外渡航（インドネシア・ニュージーランド等）関連例が多い。報告例のうち未接種29例・1回接種23例・不明50例と免疫不十分者が過半数。定期接種率は第1期92.7%・第2期91.0%と目標95%未達。</p>
+    <h3>小児科医がやること</h3><p>①麻疹疑い例には受診前に電話連絡を徹底指導し、飛沫・空気感染対策を徹底。②診断確定後は直ちに保健所へ届出（全数把握疾患）。③外来でワクチン接種歴を確認し、未接種・1回接種者への積極的な接種勧奨を実施。④令和4年4月2日〜令和5年4月1日生まれ（第1期）・平成30年4月2日〜令和元年4月1日生まれ（第2期）への接種機会延長を周知。</p>
+    <h3>対応期限</h3><p>即時対応（流行継続中）</p>
+    <p><a href="https://www.jpeds.or.jp/society-activities/post-156349.html" target="_blank" class="link-btn">元記事を開く →</a></p>
+  </div>
+</div>
+
+<div class="card" id="card-2026-04-22_1" data-cat="ワクチン・予防接種" data-url="https://www.jpeds.or.jp/society-activities/pediatric-medical-care/vaccination/opinion/post-155697.html" style="background:#fff3f3" onclick="showDetail('2026-04-22_1')">
+  <button class="star-btn" id="star-2026-04-22_1" onclick="event.stopPropagation();toggleStar('2026-04-22_1')" title="重要マーク">⭐</button>
+  <div class="card-title"><span style="background:#e53935;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:bold;">最重要</span> <span class="cat-tag">ワクチン・予防接種</span> RSウイルス母子免疫ワクチン（アブリスボ）2026年4月定期接種化</div>
+  <div class="card-meta">日本小児科学会　2026-04-22</div>
+</div>
+<div class="detail" id="detail-2026-04-22_1">
+  <div class="detail-inner">
+    <button class="close-btn" onclick="hideDetail('2026-04-22_1')">✕ 閉じる</button>
+    <button class="delete-btn" onclick="deleteItem('2026-04-22_1')">🗑 この記事を削除</button>
+    <h2><span style="background:#e53935;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:bold;">最重要</span> RSウイルス母子免疫ワクチン（アブリスボ）2026年4月定期接種化</h2>
+    <p class="meta">情報源: <a href="https://www.jpeds.or.jp/society-activities/pediatric-medical-care/vaccination/opinion/post-155697.html" target="_blank">日本小児科学会</a>　／　2026-04-22　<span class="cat-tag">ワクチン・予防接種</span></p>
+    <h3>概要</h3><p>2026年4月より妊婦を対象とする組換えRSウイルスワクチン「アブリスボ筋注用」が定期接種化。接種時期は妊娠28週0日〜36週6日、0.5mL筋注1回。胎盤を介した抗体移行により生後早期の乳児を保護する母子免疫戦略。接種後2週間以内に出生した乳児は抗体移行が不十分な可能性があり注意が必要。早産児や基礎疾患を有する児へのニルセビマブ・パリビズマブ投与はワクチン接種有無によらず引き続き推奨。</p>
+    <h3>小児科医がやること</h3><p>①乳児診察時に母子手帳でアブリスボ接種の有無・接種時期を確認し診療録に記載。②接種後2週間以内出生の乳児はRSウイルス感染リスクが高いと判断して経過観察を強化。③早産児・基礎疾患のある乳児にはニルセビマブまたはパリビズマブ投与を検討（接種の有無にかかわらず適応を評価）。④産科と情報連携を強化し、未接種妊婦への接種を促す。</p>
+    <h3>対応期限</h3><p>2026年4月〜施行済み（即時対応）</p>
+    <p><a href="https://www.jpeds.or.jp/society-activities/pediatric-medical-care/vaccination/opinion/post-155697.html" target="_blank" class="link-btn">元記事を開く →</a></p>
+  </div>
+</div>
+
+<div class="card" id="card-2026-04-22_2" data-cat="ワクチン・予防接種" data-url="https://www.kansensho.or.jp/modules/news/index.php?content_id=896" style="background:#fff8f0" onclick="showDetail('2026-04-22_2')">
+  <button class="star-btn" id="star-2026-04-22_2" onclick="event.stopPropagation();toggleStar('2026-04-22_2')" title="重要マーク">⭐</button>
+  <div class="card-title"><span style="background:#fb8c00;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:bold;">重要</span> <span class="cat-tag">ワクチン・予防接種</span> 麻しん定期接種積極勧奨と武田MRワクチン出荷再開見込み（厚労省事務連絡）</div>
+  <div class="card-meta">日本感染症学会（厚労省健康・生活衛生局感染症対策課/予防接種課）　2026-04-22</div>
+</div>
+<div class="detail" id="detail-2026-04-22_2">
+  <div class="detail-inner">
+    <button class="close-btn" onclick="hideDetail('2026-04-22_2')">✕ 閉じる</button>
+    <button class="delete-btn" onclick="deleteItem('2026-04-22_2')">🗑 この記事を削除</button>
+    <h2><span style="background:#fb8c00;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:bold;">重要</span> 麻しん定期接種積極勧奨と武田MRワクチン出荷再開見込み（厚労省事務連絡）</h2>
+    <p class="meta">情報源: <a href="https://www.kansensho.or.jp/modules/news/index.php?content_id=896" target="_blank">日本感染症学会（厚労省健康・生活衛生局感染症対策課/予防接種課）</a>　／　2026-04-22　<span class="cat-tag">ワクチン・予防接種</span></p>
+    <h3>概要</h3><p>麻疹患者数の急増を受け、厚生労働省が医療機関に対して麻しん・風しん定期接種対象者への積極的接種勧奨の協力依頼を発出。出荷停止が続いていた武田薬品工業「乾燥弱毒生麻しん風しん混合ワクチン タケダ」の出荷再開見込みも合わせて通知された。定期接種率向上と接種機会損失防止が目的。</p>
+    <h3>小児科医がやること</h3><p>①定期接種対象年齢（第1期：1歳、第2期：就学前年長）の児に積極的に接種勧奨を実施。②武田MRワクチンの出荷再開見込みを確認し、取引卸に在庫確保を依頼。③接種機会を逃している未接種者リストを抽出して連絡し、受診を促す。</p>
+    <h3>対応期限</h3><p>即時対応（麻疹流行継続中）</p>
+    <p><a href="https://www.kansensho.or.jp/modules/news/index.php?content_id=896" target="_blank" class="link-btn">元記事を開く →</a></p>
+  </div>
+</div>
+
+<div class="card" id="card-2026-04-22_3" data-cat="ワクチン・予防接種" data-url="https://www.jpeds.or.jp/society-activities/post-155658.html" style="background:#fff8f0" onclick="showDetail('2026-04-22_3')">
+  <button class="star-btn" id="star-2026-04-22_3" onclick="event.stopPropagation();toggleStar('2026-04-22_3')" title="重要マーク">⭐</button>
+  <div class="card-title"><span style="background:#fb8c00;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:bold;">重要</span> <span class="cat-tag">ワクチン・予防接種</span> 小児周術期ワクチンスケジュール コンセンサスステートメント公表</div>
+  <div class="card-meta">日本小児科学会　2026-04-22</div>
+</div>
+<div class="detail" id="detail-2026-04-22_3">
+  <div class="detail-inner">
+    <button class="close-btn" onclick="hideDetail('2026-04-22_3')">✕ 閉じる</button>
+    <button class="delete-btn" onclick="deleteItem('2026-04-22_3')">🗑 この記事を削除</button>
+    <h2><span style="background:#fb8c00;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:bold;">重要</span> 小児周術期ワクチンスケジュール コンセンサスステートメント公表</h2>
+    <p class="meta">情報源: <a href="https://www.jpeds.or.jp/society-activities/post-155658.html" target="_blank">日本小児科学会</a>　／　2026-04-22　<span class="cat-tag">ワクチン・予防接種</span></p>
+    <h3>概要</h3><p>2026年3月27日、手術予定のある小児に対するワクチン接種タイミングの初のコンセンサスステートメントが公表。術前接種は不活化・mRNAワクチンは48時間前まで可、注射生ワクチン（麻疹・風疹・水痘）は3週間前まで、おたふく・BCG・経口ロタは4週間前までが目安。術後はすべてのワクチンを状態安定まで延期（血液製剤投与後の注射生ワクチンは3〜6か月延期）。主治医の臨床判断が最優先で、ワクチン接種が手術を遅延させてはならないとしている。</p>
+    <h3>小児科医がやること</h3><p>①手術予定の小児の診察時に本ステートメントを参照し、外科・麻酔科と接種スケジュールを事前調整。②ワクチン接種の機会損失を防ぐため、術前・術後の接種計画をあらかじめ文書化して連絡。③緊急手術では手術を最優先し、術後に改めてスケジュールを組み直す。</p>
+    <h3>対応期限</h3><p>即時（新規ガイドライン：2026年3月27日公表）</p>
+    <p><a href="https://www.jpeds.or.jp/society-activities/post-155658.html" target="_blank" class="link-btn">元記事を開く →</a></p>
+  </div>
+</div>
+
+<div class="card" id="card-2026-04-22_4" data-cat="医薬品供給" data-url="https://medical-tribune.co.jp/rensai/articles/?blogid=11&entryid=571651" style="background:#f0f6ff" onclick="showDetail('2026-04-22_4')">
+  <button class="star-btn" id="star-2026-04-22_4" onclick="event.stopPropagation();toggleStar('2026-04-22_4')" title="重要マーク">⭐</button>
+  <div class="card-title"><span style="background:#1976d2;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:bold;">参考</span> <span class="cat-tag">医薬品供給</span> 白色ワセリン（ヴィアトリス製薬）が出荷停止に</div>
+  <div class="card-meta">メディカルトリビューン　2026-04-22</div>
+</div>
+<div class="detail" id="detail-2026-04-22_4">
+  <div class="detail-inner">
+    <button class="close-btn" onclick="hideDetail('2026-04-22_4')">✕ 閉じる</button>
+    <button class="delete-btn" onclick="deleteItem('2026-04-22_4')">🗑 この記事を削除</button>
+    <h2><span style="background:#1976d2;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:bold;">参考</span> 白色ワセリン（ヴィアトリス製薬）が出荷停止に</h2>
+    <p class="meta">情報源: <a href="https://medical-tribune.co.jp/rensai/articles/?blogid=11&entryid=571651" target="_blank">メディカルトリビューン</a>　／　2026-04-22　<span class="cat-tag">医薬品供給</span></p>
+    <h3>概要</h3><p>ヴィアトリス製薬は2026年4月17日、需要増加を理由に白色ワセリンを出荷停止と発表。同時に沈降炭酸カルシウム（カルタン錠500）500mg瓶・バラも出荷停止（需要増加＋製造所からの納品遅延）、100mg PTPは限定出荷となった。白色ワセリンは小児科・皮膚科の軟膏基剤として日常的に使用されており、処方への影響が懸念される。</p>
+    <h3>小児科医がやること</h3><p>①院内・調剤薬局の白色ワセリン在庫を確認し、代替品（プロペトや他社白色ワセリン）への切り替えを検討。②アトピー性皮膚炎等で白色ワセリンを定期処方している患者・保護者に代替品での対応が可能であることを説明。③取引卸から入荷見通しを確認し、在庫管理を強化する。</p>
+    <h3>対応期限</h3><p>即時（在庫確認を優先）</p>
+    <p><a href="https://medical-tribune.co.jp/rensai/articles/?blogid=11&entryid=571651" target="_blank" class="link-btn">元記事を開く →</a></p>
+  </div>
+</div>
+<div class="date-header" id="date-2026-04-21">2026年4月21日</div>
+
+<div class="card" id="card-2026-04-21_0" data-cat="医薬品供給" data-url="https://www.mhlw.go.jp/content/10800000/260420iyakuhinkyoukyu.xlsx" style="background:#f0f6ff" onclick="showDetail('2026-04-21_0')">
+  <button class="star-btn" id="star-2026-04-21_0" onclick="event.stopPropagation();toggleStar('2026-04-21_0')" title="重要マーク">⭐</button>
+  <div class="card-title"><span style="background:#1976d2;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:bold;">参考</span> <span class="cat-tag">医薬品供給</span> 医薬品限定出荷（小児科）: ラベプラゾール</div>
+  <div class="card-meta">厚生労働省（医療用医薬品供給状況）　2026-04-21</div>
+</div>
+<div class="detail" id="detail-2026-04-21_0">
+  <div class="detail-inner">
+    <button class="close-btn" onclick="hideDetail('2026-04-21_0')">✕ 閉じる</button>
+    <button class="delete-btn" onclick="deleteItem('2026-04-21_0')">🗑 この記事を削除</button>
+    <h2><span style="background:#1976d2;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:bold;">参考</span> 医薬品限定出荷（小児科）: ラベプラゾール</h2>
+    <p class="meta">情報源: <a href="https://www.mhlw.go.jp/content/10800000/260420iyakuhinkyoukyu.xlsx" target="_blank">厚生労働省（医療用医薬品供給状況）</a>　／　2026-04-21　<span class="cat-tag">医薬品供給</span></p>
+    <h3>概要</h3><p>2026年04月21日現在、小児科で使用頻度の高い以下の成分が新たに限定出荷となりました: ラベプラゾール（後発品各社製品）。</p>
+    <h3>小児科医がやること</h3><p>在庫状況を確認し、供給が逼迫する前に代替薬への切り替えを検討してください。患者・保護者への説明も早めに行ってください。</p>
+    
+    <p><a href="https://www.mhlw.go.jp/content/10800000/260420iyakuhinkyoukyu.xlsx" target="_blank" class="link-btn">元記事を開く →</a></p>
+  </div>
+</div>
+<div class="date-header" id="date-2026-04-16">2026年4月16日</div>
+
+<div class="card" id="card-2026-04-16_0" data-cat="医薬品供給" data-url="https://www.mhlw.go.jp/content/10800000/260414iyakuhinkyoukyu.xlsx" style="background:#f0f6ff" onclick="showDetail('2026-04-16_0')">
+  <button class="star-btn" id="star-2026-04-16_0" onclick="event.stopPropagation();toggleStar('2026-04-16_0')" title="重要マーク">⭐</button>
+  <div class="card-title"><span style="background:#1976d2;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:bold;">参考</span> <span class="cat-tag">医薬品供給</span> 医薬品限定出荷（小児科）: ラベプラゾール</div>
+  <div class="card-meta">厚生労働省（医療用医薬品供給状況）　2026-04-16</div>
+</div>
+<div class="detail" id="detail-2026-04-16_0">
+  <div class="detail-inner">
+    <button class="close-btn" onclick="hideDetail('2026-04-16_0')">✕ 閉じる</button>
+    <button class="delete-btn" onclick="deleteItem('2026-04-16_0')">🗑 この記事を削除</button>
+    <h2><span style="background:#1976d2;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:bold;">参考</span> 医薬品限定出荷（小児科）: ラベプラゾール</h2>
+    <p class="meta">情報源: <a href="https://www.mhlw.go.jp/content/10800000/260414iyakuhinkyoukyu.xlsx" target="_blank">厚生労働省（医療用医薬品供給状況）</a>　／　2026-04-16　<span class="cat-tag">医薬品供給</span></p>
+    <h3>概要</h3><p>2026年04月16日現在、小児科で使用頻度の高い以下の成分が新たに限定出荷となりました: ラベプラゾール（後発品各社製品）。</p>
+    <h3>小児科医がやること</h3><p>在庫状況を確認し、供給が逼迫する前に代替薬への切り替えを検討してください。患者・保護者への説明も早めに行ってください。</p>
+    
+    <p><a href="https://www.mhlw.go.jp/content/10800000/260414iyakuhinkyoukyu.xlsx" target="_blank" class="link-btn">元記事を開く →</a></p>
+  </div>
+</div>
+<div class="date-header" id="date-2026-04-12">2026年4月12日</div>
+
+<div class="card" id="card-2026-04-12_0" data-cat="医薬品供給" data-url="https://www.mhlw.go.jp/content/10800000/260410iyakuhinkyoukyu.xlsx" style="background:#f0f6ff" onclick="showDetail('2026-04-12_0')">
+  <button class="star-btn" id="star-2026-04-12_0" onclick="event.stopPropagation();toggleStar('2026-04-12_0')" title="重要マーク">⭐</button>
+  <div class="card-title"><span style="background:#1976d2;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:bold;">参考</span> <span class="cat-tag">医薬品供給</span> 医薬品限定出荷（小児科）: カルボシステイン・アシクロビル・アジスロマイシン他3</div>
+  <div class="card-meta">厚生労働省（医療用医薬品供給状況）　2026-04-12</div>
+</div>
+<div class="detail" id="detail-2026-04-12_0">
+  <div class="detail-inner">
+    <button class="close-btn" onclick="hideDetail('2026-04-12_0')">✕ 閉じる</button>
+    <button class="delete-btn" onclick="deleteItem('2026-04-12_0')">🗑 この記事を削除</button>
+    <h2><span style="background:#1976d2;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:bold;">参考</span> 医薬品限定出荷（小児科）: カルボシステイン・アシクロビル・アジスロマイシン他3</h2>
+    <p class="meta">情報源: <a href="https://www.mhlw.go.jp/content/10800000/260410iyakuhinkyoukyu.xlsx" target="_blank">厚生労働省（医療用医薬品供給状況）</a>　／　2026-04-12　<span class="cat-tag">医薬品供給</span></p>
+    <h3>概要</h3><p>2026年04月12日現在、小児科で使用頻度の高い以下の成分が新たに限定出荷となりました: カルボシステイン、アシクロビル、アジスロマイシン、アテノロール、アモキシシリン、アンブロキソール、イブプロフェン、エリスロマイシン、オロパタジン、カルバマゼピン、クラリスロマイシン、ジクロフェナク、セチリジン、セファレキシン、セフカペン、テオフィリン、トスフロキサシン、ドンペリドン、バルプロ酸、ファモチジン、フェキソフェナジン、プランルカスト、ミノサイクリン、メトクロプラミド、モンテルカスト、ランソプラゾール、レベチラセタム、ロラタジン、ツロブテロール、亜鉛、ブデソニド、アルプロスタジル、インスリン、ガンシクロビル、テイコプラニン、フィルグラスチム、ミダゾラム、おたふくかぜワクチン（後発品各社製品）。</p>
+    <h3>小児科医がやること</h3><p>在庫状況を確認し、供給が逼迫する前に代替薬への切り替えを検討してください。患者・保護者への説明も早めに行ってください。</p>
+    
+    <p><a href="https://www.mhlw.go.jp/content/10800000/260410iyakuhinkyoukyu.xlsx" target="_blank" class="link-btn">元記事を開く →</a></p>
+  </div>
+</div>
+</div>
+<script>
+function showDetail(uid) {
+  document.getElementById('detail-' + uid).style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+function hideDetail(uid) {
+  document.getElementById('detail-' + uid).style.display = 'none';
+  document.body.style.overflow = '';
+}
+document.querySelectorAll('.detail').forEach(function(el) {
+  el.addEventListener('click', function(e) {
+    if (e.target === el) {
+      el.style.display = 'none';
+      document.body.style.overflow = '';
+    }
+  });
+});
+
+// 重要マーク
+var STAR_KEY = 'pedinfo_starred';
+function getStarred() { try { return JSON.parse(localStorage.getItem(STAR_KEY) || '[]'); } catch(e) { return []; } }
+function toggleStar(uid) {
+  var starred = getStarred();
+  var idx = starred.indexOf(uid);
+  if (idx === -1) { starred.push(uid); } else { starred.splice(idx, 1); }
+  localStorage.setItem(STAR_KEY, JSON.stringify(starred));
+  updateStarUI(uid, idx === -1);
+}
+function updateStarUI(uid, isStarred) {
+  var btn = document.getElementById('star-' + uid);
+  if (btn) btn.classList.toggle('starred', isStarred);
+  var card = document.getElementById('card-' + uid);
+  if (card) card.dataset.starred = isStarred ? '1' : '';
+}
+
+// アーカイブ全データ（削除時フルデータ保存のため）
+var ARCHIVE_ITEMS = {"2026-04-22_0": {"title": "2026年麻疹患者数急増に関する注意喚起（日本小児科学会）", "url": "https://www.jpeds.or.jp/society-activities/post-156349.html", "source_name": "日本小児科学会", "summary": "2026年第1〜12週の麻疹累積報告数は152例に達し、流行の兆しが顕著。東京（40例）・愛知（23例）が中心で、海外渡航（インドネシア・ニュージーランド等）関連例が多い。報告例のうち未接種29例・1回接種23例・不明50例と免疫不十分者が過半数。定期接種率は第1期92.7%・第2期91.0%と目標95%未達。", "action_required": "①麻疹疑い例には受診前に電話連絡を徹底指導し、飛沫・空気感染対策を徹底。②診断確定後は直ちに保健所へ届出（全数把握疾患）。③外来でワクチン接種歴を確認し、未接種・1回接種者への積極的な接種勧奨を実施。④令和4年4月2日〜令和5年4月1日生まれ（第1期）・平成30年4月2日〜令和元年4月1日生まれ（第2期）への接種機会延長を周知。", "deadline_hint": "即時対応（流行継続中）", "importance": "最重要", "category": "感染症", "archive_date": "2026-04-22"}, "2026-04-22_1": {"title": "RSウイルス母子免疫ワクチン（アブリスボ）2026年4月定期接種化", "url": "https://www.jpeds.or.jp/society-activities/pediatric-medical-care/vaccination/opinion/post-155697.html", "source_name": "日本小児科学会", "summary": "2026年4月より妊婦を対象とする組換えRSウイルスワクチン「アブリスボ筋注用」が定期接種化。接種時期は妊娠28週0日〜36週6日、0.5mL筋注1回。胎盤を介した抗体移行により生後早期の乳児を保護する母子免疫戦略。接種後2週間以内に出生した乳児は抗体移行が不十分な可能性があり注意が必要。早産児や基礎疾患を有する児へのニルセビマブ・パリビズマブ投与はワクチン接種有無によらず引き続き推奨。", "action_required": "①乳児診察時に母子手帳でアブリスボ接種の有無・接種時期を確認し診療録に記載。②接種後2週間以内出生の乳児はRSウイルス感染リスクが高いと判断して経過観察を強化。③早産児・基礎疾患のある乳児にはニルセビマブまたはパリビズマブ投与を検討（接種の有無にかかわらず適応を評価）。④産科と情報連携を強化し、未接種妊婦への接種を促す。", "deadline_hint": "2026年4月〜施行済み（即時対応）", "importance": "最重要", "category": "ワクチン・予防接種", "archive_date": "2026-04-22"}, "2026-04-22_2": {"title": "麻しん定期接種積極勧奨と武田MRワクチン出荷再開見込み（厚労省事務連絡）", "url": "https://www.kansensho.or.jp/modules/news/index.php?content_id=896", "source_name": "日本感染症学会（厚労省健康・生活衛生局感染症対策課/予防接種課）", "summary": "麻疹患者数の急増を受け、厚生労働省が医療機関に対して麻しん・風しん定期接種対象者への積極的接種勧奨の協力依頼を発出。出荷停止が続いていた武田薬品工業「乾燥弱毒生麻しん風しん混合ワクチン タケダ」の出荷再開見込みも合わせて通知された。定期接種率向上と接種機会損失防止が目的。", "action_required": "①定期接種対象年齢（第1期：1歳、第2期：就学前年長）の児に積極的に接種勧奨を実施。②武田MRワクチンの出荷再開見込みを確認し、取引卸に在庫確保を依頼。③接種機会を逃している未接種者リストを抽出して連絡し、受診を促す。", "deadline_hint": "即時対応（麻疹流行継続中）", "importance": "重要", "category": "ワクチン・予防接種", "archive_date": "2026-04-22"}, "2026-04-22_3": {"title": "小児周術期ワクチンスケジュール コンセンサスステートメント公表", "url": "https://www.jpeds.or.jp/society-activities/post-155658.html", "source_name": "日本小児科学会", "summary": "2026年3月27日、手術予定のある小児に対するワクチン接種タイミングの初のコンセンサスステートメントが公表。術前接種は不活化・mRNAワクチンは48時間前まで可、注射生ワクチン（麻疹・風疹・水痘）は3週間前まで、おたふく・BCG・経口ロタは4週間前までが目安。術後はすべてのワクチンを状態安定まで延期（血液製剤投与後の注射生ワクチンは3〜6か月延期）。主治医の臨床判断が最優先で、ワクチン接種が手術を遅延させてはならないとしている。", "action_required": "①手術予定の小児の診察時に本ステートメントを参照し、外科・麻酔科と接種スケジュールを事前調整。②ワクチン接種の機会損失を防ぐため、術前・術後の接種計画をあらかじめ文書化して連絡。③緊急手術では手術を最優先し、術後に改めてスケジュールを組み直す。", "deadline_hint": "即時（新規ガイドライン：2026年3月27日公表）", "importance": "重要", "category": "ワクチン・予防接種", "archive_date": "2026-04-22"}, "2026-04-22_4": {"title": "白色ワセリン（ヴィアトリス製薬）が出荷停止に", "url": "https://medical-tribune.co.jp/rensai/articles/?blogid=11&entryid=571651", "source_name": "メディカルトリビューン", "summary": "ヴィアトリス製薬は2026年4月17日、需要増加を理由に白色ワセリンを出荷停止と発表。同時に沈降炭酸カルシウム（カルタン錠500）500mg瓶・バラも出荷停止（需要増加＋製造所からの納品遅延）、100mg PTPは限定出荷となった。白色ワセリンは小児科・皮膚科の軟膏基剤として日常的に使用されており、処方への影響が懸念される。", "action_required": "①院内・調剤薬局の白色ワセリン在庫を確認し、代替品（プロペトや他社白色ワセリン）への切り替えを検討。②アトピー性皮膚炎等で白色ワセリンを定期処方している患者・保護者に代替品での対応が可能であることを説明。③取引卸から入荷見通しを確認し、在庫管理を強化する。", "deadline_hint": "即時（在庫確認を優先）", "importance": "情報", "category": "医薬品供給", "archive_date": "2026-04-22"}, "2026-04-21_0": {"title": "医薬品限定出荷（小児科）: ラベプラゾール", "url": "https://www.mhlw.go.jp/content/10800000/260420iyakuhinkyoukyu.xlsx", "source_name": "厚生労働省（医療用医薬品供給状況）", "category": "医薬品供給", "summary": "2026年04月21日現在、小児科で使用頻度の高い以下の成分が新たに限定出荷となりました: ラベプラゾール（後発品各社製品）。", "action_required": "在庫状況を確認し、供給が逼迫する前に代替薬への切り替えを検討してください。患者・保護者への説明も早めに行ってください。", "deadline_hint": "", "importance": "情報", "archive_date": "2026-04-21"}, "2026-04-16_0": {"title": "医薬品限定出荷（小児科）: ラベプラゾール", "url": "https://www.mhlw.go.jp/content/10800000/260414iyakuhinkyoukyu.xlsx", "source_name": "厚生労働省（医療用医薬品供給状況）", "category": "医薬品供給", "summary": "2026年04月16日現在、小児科で使用頻度の高い以下の成分が新たに限定出荷となりました: ラベプラゾール（後発品各社製品）。", "action_required": "在庫状況を確認し、供給が逼迫する前に代替薬への切り替えを検討してください。患者・保護者への説明も早めに行ってください。", "deadline_hint": "", "importance": "情報", "archive_date": "2026-04-16"}, "2026-04-12_0": {"title": "医薬品限定出荷（小児科）: カルボシステイン・アシクロビル・アジスロマイシン他3", "url": "https://www.mhlw.go.jp/content/10800000/260410iyakuhinkyoukyu.xlsx", "source_name": "厚生労働省（医療用医薬品供給状況）", "category": "医薬品供給", "summary": "2026年04月12日現在、小児科で使用頻度の高い以下の成分が新たに限定出荷となりました: カルボシステイン、アシクロビル、アジスロマイシン、アテノロール、アモキシシリン、アンブロキソール、イブプロフェン、エリスロマイシン、オロパタジン、カルバマゼピン、クラリスロマイシン、ジクロフェナク、セチリジン、セファレキシン、セフカペン、テオフィリン、トスフロキサシン、ドンペリドン、バルプロ酸、ファモチジン、フェキソフェナジン、プランルカスト、ミノサイクリン、メトクロプラミド、モンテルカスト、ランソプラゾール、レベチラセタム、ロラタジン、ツロブテロール、亜鉛、ブデソニド、アルプロスタジル、インスリン、ガンシクロビル、テイコプラニン、フィルグラスチム、ミダゾラム、おたふくかぜワクチン（後発品各社製品）。", "action_required": "在庫状況を確認し、供給が逼迫する前に代替薬への切り替えを検討してください。患者・保護者への説明も早めに行ってください。", "deadline_hint": "", "importance": "情報", "archive_date": "2026-04-12"}};
+var DELETED_KEY = 'pedinfo_deleted_items';
+var RESTORED_KEY = 'pedinfo_restored_items';
+function getDeleted() { try { return JSON.parse(localStorage.getItem(DELETED_KEY) || '[]'); } catch(e) { return []; } }
+function getRestored() { try { return JSON.parse(localStorage.getItem(RESTORED_KEY) || '[]'); } catch(e) { return []; } }
+
+function deleteItem(uid) {
+  if (!confirm('この記事をアーカイブから削除しますか？')) return;
+  var item = ARCHIVE_ITEMS[uid];
+  var deleted = getDeleted();
+  var urls = deleted.map(function(d) { return d.url; });
+  if (item && urls.indexOf(item.url) === -1) deleted.push(item);
+  localStorage.setItem(DELETED_KEY, JSON.stringify(deleted));
+  hideDetail(uid);
+  var card = document.getElementById('card-' + uid);
+  if (card) card.style.display = 'none';
+}
+
+// ページ読み込み時: 削除済みを非表示、復元済みを追加表示、初期フィルター適用
+(function() {
+  var starred = getStarred();
+  starred.forEach(function(uid) { updateStarUI(uid, true); });
+
+  filterCat('!医薬品供給');
+  var deleted = getDeleted();
+  var deletedUrls = deleted.map(function(d) { return typeof d === 'string' ? d : d.url; });
+  document.querySelectorAll('.card').forEach(function(card) {
+    if (deletedUrls.indexOf(card.dataset.url) !== -1) card.style.display = 'none';
+  });
+
+  // 復元済み記事をページ上部に挿入
+  var restored = getRestored();
+  if (restored.length === 0) return;
+  var container = document.querySelector('.container');
+  var badge = {'最重要':'<span style="background:#e53935;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:bold;">最重要</span>','重要':'<span style="background:#fb8c00;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:bold;">重要</span>','情報':'<span style="background:#1976d2;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:bold;">参考</span>'};
+  var header = document.createElement('div');
+  header.style.cssText = 'font-size:14px;font-weight:bold;color:#2e7d32;margin:16px 0 8px;border-left:4px solid #2e7d32;padding-left:10px;';
+  header.textContent = '↩ 復元済み記事';
+  container.insertBefore(header, container.children[2]);
+  restored.forEach(function(item, i) {
+    var imp = item.importance || '情報';
+    var b = badge[imp] || badge['情報'];
+    var cat = item.category ? '<span style="background:#e0f2f1;color:#00796b;border:1px solid #80cbc4;padding:1px 7px;border-radius:10px;font-size:11px;vertical-align:middle;">' + item.category + '</span>' : '';
+    var div = document.createElement('div');
+    div.style.cssText = 'border-radius:8px;padding:12px 16px;margin-bottom:8px;box-shadow:0 1px 3px rgba(0,0,0,0.1);background:#f1f8e9;border:1px dashed #a5d6a7;';
+    div.innerHTML = '<div style="font-size:14px;font-weight:bold;line-height:1.5;">' + b + ' ' + cat + ' ' + (item.title||'') + '</div>' +
+      '<div style="font-size:12px;color:#888;margin-top:4px;">' + (item.source_name||'') + '　<span style="color:#2e7d32">（復元済み・次回更新で確定）</span></div>';
+    container.insertBefore(div, container.children[3 + i]);
+  });
+})();
+
+// カテゴリフィルター（cat='' で全表示、cat='!X' でXを除く、cat='★重要' でスター付きのみ）
+function filterCat(cat) {
+  document.querySelectorAll('.cat-btn').forEach(function(btn) {
+    btn.classList.toggle('active', btn.dataset.cat === cat);
+  });
+  var deleted = getDeleted();
+  var deletedUrls = deleted.map(function(d) { return typeof d === 'string' ? d : d.url; });
+  document.querySelectorAll('.card').forEach(function(card) {
+    if (deletedUrls.indexOf(card.dataset.url) !== -1) { card.style.display = 'none'; return; }
+    if (!cat) { card.style.display = ''; return; }
+    if (cat === '★重要') { card.style.display = card.dataset.starred === '1' ? '' : 'none'; return; }
+    if (cat.charAt(0) === '!') { card.style.display = card.dataset.cat === cat.slice(1) ? 'none' : ''; return; }
+    card.style.display = card.dataset.cat === cat ? '' : 'none';
+  });
+}
+</script>
+</body>
+</html>
